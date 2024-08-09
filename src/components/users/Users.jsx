@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -17,7 +18,18 @@ const Users = () => {
 
   useEffect(() => {
     getUsers();
-  }, []);
+  }, [users]);
+
+  const handleDelete = async (id) => {
+    await axios
+      .delete(`http://localhost:7000/api/user/${id}`)
+      .then((res) => {
+        toast.success(res.data.msg, { position: "top-center" });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   return (
     <>
@@ -43,19 +55,21 @@ const Users = () => {
                 <tr key={index}>
                   <td className="border border-slate-500 p-2">{index + 1}</td>
                   <td className="border border-slate-500 p-2">
-                    {curUser.fname}
-                    {curUser.lname}
+                    {curUser.fname} {curUser.lname}
                   </td>
                   <td className="border border-slate-500 p-2">
                     {curUser.email}
                   </td>
                   <td className="border border-slate-500 p-2 ">
-                    <Link to={"/update"}>
+                    <Link to={`/update/` + curUser._id}>
                       <button className="m-2 px-2 rounded-md text-white font-bold bg-slate-500 shadow-xl">
                         Edit
                       </button>
                     </Link>
-                    <button className="m-2 px-2 rounded-md text-white font-bold bg-red-500 shadow-xl">
+                    <button
+                      className="m-2 px-2 rounded-md text-white font-bold bg-red-500 shadow-xl"
+                      onClick={() => handleDelete(curUser._id)}
+                    >
                       Delete
                     </button>
                   </td>
